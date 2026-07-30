@@ -2,12 +2,10 @@ package configs
 
 import (
 	"log"
-
 	"os"
 
 	"github.com/joho/godotenv"
 )
-
 
 type ConfigStruct struct {
 
@@ -20,14 +18,14 @@ type ConfigStruct struct {
 	DBName string
 
 	DBPort string
-}
 
+
+	JWTSecret string
+}
 
 var Config ConfigStruct
 
-
 func LoadConfig() {
-
 
 	err := godotenv.Load()
 
@@ -36,7 +34,6 @@ func LoadConfig() {
 		log.Println("No .env file found")
 
 	}
-
 
 	Config = ConfigStruct{
 
@@ -49,6 +46,8 @@ func LoadConfig() {
 		DBName: os.Getenv("DB_NAME"),
 
 		DBPort: os.Getenv("DB_PORT"),
+
+		JWTSecret: os.Getenv("JWT_SECRET"),
 
 	}
 
