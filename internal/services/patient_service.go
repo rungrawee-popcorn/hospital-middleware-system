@@ -61,6 +61,23 @@ func (s *PatientService) SearchPatient(
 		return patients, nil
 	}
 
+	// Check hospital exists before calling external API.
+	// Prevent invalid hospital token from accessing Hospital A API.
+	var hospitalCount int64
+
+	s.Repository.DB.
+		Model(&model.Hospital{}).
+		Where(
+			"id = ?",
+			hospitalID,
+		).
+		Count(&hospitalCount)
+
+	if hospitalCount == 0 {
+
+		return []model.Patient{}, nil
+	}
+
 	// Not found.
 	// Hospital A API only supports national_id or passport_id.
 	var identifier string
