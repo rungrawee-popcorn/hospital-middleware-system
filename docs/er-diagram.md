@@ -59,31 +59,3 @@
 | updated_at           |
 +----------------------+
 ```
-
-```md
-## Relationship Description
-
-### Hospital - Staff
-
-One Hospital can have many Staff members.
-
-Relationship:
-
-Hospital (1) ---- (Many) Staff
-
-### Hospital - Patient
-
-One Hospital can have many Patients.
-
-Relationship:
-
-Hospital (1) ---- (Many) Patient
-
-### Access Control
-
-A staff member can only search patients belonging to the same hospital.
-
-The relationship is validated by:
-
-staffs.hospital_id = patients.hospital_id
-```
