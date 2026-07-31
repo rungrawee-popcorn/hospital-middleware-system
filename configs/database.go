@@ -10,9 +10,7 @@ import (
 	"gorm.io/gorm"
 )
 
-
 var DB *gorm.DB
-
 
 func ConnectDatabase() {
 
@@ -25,12 +23,10 @@ func ConnectDatabase() {
 		Config.DBPort,
 	)
 
-
 	database, err := gorm.Open(
 		postgres.Open(dsn),
 		&gorm.Config{},
 	)
-
 
 	if err != nil {
 
@@ -38,14 +34,10 @@ func ConnectDatabase() {
 
 	}
 
-
 	DB = database
-
 
 	log.Println("Database connected successfully")
 }
-
-
 
 func AutoMigrate() {
 
@@ -55,13 +47,11 @@ func AutoMigrate() {
 		&model.Patient{},
 	)
 
-
 	if err != nil {
 
 		log.Fatal("Migration failed:", err)
 
 	}
-
 
 	log.Println("Migration completed successfully")
 }

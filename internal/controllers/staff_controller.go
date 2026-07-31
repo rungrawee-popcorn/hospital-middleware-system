@@ -30,6 +30,12 @@ type CreateStaffRequest struct {
 	HospitalID uint   `json:"hospital_id"`
 }
 
+type LoginRequest struct {
+	Username   string `json:"username"`
+	Password   string `json:"password"`
+	HospitalID uint   `json:"hospital_id"`
+}
+
 // POST /staff/create
 func (c *StaffController) CreateStaff(ctx *gin.Context) {
 
@@ -39,7 +45,7 @@ func (c *StaffController) CreateStaff(ctx *gin.Context) {
 
 		ctx.JSON(http.StatusBadRequest, gin.H{
 			"message": "invalid request",
-			"error": err.Error(),
+			"error":   err.Error(),
 		})
 
 		return
@@ -75,32 +81,35 @@ func (c *StaffController) CreateStaff(ctx *gin.Context) {
 
 	ctx.JSON(http.StatusCreated, gin.H{
 		"message": "staff created successfully",
+		"staff": gin.H{
+			"id":          staff.ID,
+			"username":    staff.Username,
+			"hospital_id": staff.HospitalID,
+		},
 	})
 }
-
 
 // POST /staff/login
 func (c *StaffController) Login(ctx *gin.Context) {
 
-	var request struct {
-		Username string `json:"username"`
-		Password string `json:"password"`
-	}
+	var request LoginRequest
 
 	if err := ctx.ShouldBindJSON(&request); err != nil {
 
 		ctx.JSON(http.StatusBadRequest, gin.H{
 			"message": "invalid request",
+			"error":   err.Error(),
 		})
 
 		return
 	}
 
 	if request.Username == "" ||
-		request.Password == "" {
+		request.Password == "" ||
+		request.HospitalID == 0 {
 
 		ctx.JSON(http.StatusBadRequest, gin.H{
-			"message": "username and password are required",
+			"message": "username, password and hospital_id are required",
 		})
 
 		return
@@ -109,6 +118,7 @@ func (c *StaffController) Login(ctx *gin.Context) {
 	staff, token, err := c.StaffService.Login(
 		request.Username,
 		request.Password,
+		request.HospitalID,
 		configs.Config.JWTSecret,
 	)
 
@@ -123,11 +133,12 @@ func (c *StaffController) Login(ctx *gin.Context) {
 
 	ctx.JSON(http.StatusOK, gin.H{
 		"message": "login successful",
-		"token": token,
+		"token":   token,
 		"staff": gin.H{
-			"id": staff.ID,
-			"username": staff.Username,
+			"id":          staff.ID,
+			"username":    staff.Username,
 			"hospital_id": staff.HospitalID,
+			"hospital":    staff.Hospital.Name,
 		},
 	})
 }

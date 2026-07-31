@@ -26,24 +26,30 @@ func JWTMiddleware() gin.HandlerFunc {
 			return
 		}
 
-		tokenString := strings.Replace(
+		if !strings.HasPrefix(authHeader, "Bearer ") {
+
+			ctx.JSON(http.StatusUnauthorized, gin.H{
+				"message": "invalid authorization header",
+			})
+
+			ctx.Abort()
+			return
+		}
+
+		tokenString := strings.TrimPrefix(
 			authHeader,
 			"Bearer ",
-			"",
-			1,
 		)
 
 		token, err := jwt.Parse(
 			tokenString,
 			func(token *jwt.Token) (interface{}, error) {
 
-
 				if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 
 					return nil, jwt.ErrSignatureInvalid
 
 				}
-
 
 				return []byte(configs.Config.JWTSecret), nil
 
@@ -56,10 +62,72 @@ func JWTMiddleware() gin.HandlerFunc {
 				"message": "invalid token",
 			})
 
+			ctx.Abort()
+			return
+		}
+
+		claims, ok := token.Claims.(jwt.MapClaims)
+
+		if !ok {
+
+			ctx.JSON(http.StatusUnauthorized, gin.H{
+				"message": "invalid token claims",
+			})
 
 			ctx.Abort()
 			return
 		}
+
+		staffID, ok := claims["staff_id"].(float64)
+
+		if !ok {
+
+			ctx.JSON(http.StatusUnauthorized, gin.H{
+				"message": "invalid staff id",
+			})
+
+			ctx.Abort()
+			return
+		}
+
+		hospitalID, ok := claims["hospital_id"].(float64)
+
+		if !ok {
+
+			ctx.JSON(http.StatusUnauthorized, gin.H{
+				"message": "invalid hospital id",
+			})
+
+			ctx.Abort()
+			return
+		}
+
+		username, ok := claims["username"].(string)
+
+		if !ok {
+
+			ctx.JSON(http.StatusUnauthorized, gin.H{
+				"message": "invalid username",
+			})
+
+			ctx.Abort()
+			return
+		}
+
+		ctx.Set(
+			"staff_id",
+			uint(staffID),
+		)
+
+		ctx.Set(
+			"hospital_id",
+			uint(hospitalID),
+		)
+
+		ctx.Set(
+			"username",
+			username,
+		)
 
 		ctx.Next()
 

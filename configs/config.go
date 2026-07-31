@@ -8,7 +8,6 @@ import (
 )
 
 type ConfigStruct struct {
-
 	DBHost string
 
 	DBUser string
@@ -19,8 +18,9 @@ type ConfigStruct struct {
 
 	DBPort string
 
-
 	JWTSecret string
+
+	HospitalAAPIURL string
 }
 
 var Config ConfigStruct
@@ -49,6 +49,7 @@ func LoadConfig() {
 
 		JWTSecret: os.Getenv("JWT_SECRET"),
 
+		HospitalAAPIURL: os.Getenv("HOSPITAL_A_API_URL"),
 	}
 
 }
